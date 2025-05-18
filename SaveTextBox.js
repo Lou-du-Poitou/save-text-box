@@ -3,9 +3,9 @@
 *    @license MIT License
 *    <save-text-box> Custom Element
 */
-// https://encryption.nexcord.pro/lou-du-poitou //
+// http://loudupoitou.dns-dynamic.net //
 
-const getLang = () => {
+const _stbGetLang = () => {
     const languages = {
         "fr": ["Modifier", "Annuler", "Enregistrer"],
         "en": ["Edit", "Cancel", "Save"],
@@ -16,34 +16,36 @@ const getLang = () => {
     return languages[document.documentElement.lang] ? 
     languages[document.documentElement.lang] : 
     languages["en"];
-}
+};
 
 class SaveTextBox extends HTMLElement {
     constructor() {
         super();
-        this.saveValue = this.innerText.trim();
+        let saveValue = this.innerText.trim();
+        const language = _stbGetLang();
         this.innerHTML = `
-            <form style="display: block; border: solid 2px #000000; border-radius: 5px; margin: 0 auto; min-width: 180px;" onsubmit="return false;">
-                <div style="display: flex;">
-                    <textarea style="resize: none; width: 100%; padding: 0; margin: 5px; height: 200px; outline: none;" readonly title="content">${this.saveValue}</textarea>
+            <form style="display: flex; flex-direction: column; box-sizing: border-box; border: solid 2px #000000; border-radius: 5px; min-width: 180px; min-height: 180px;" onsubmit="return false;">
+                <div style="display: flex; height: 100%;">
+                    <textarea style="resize: none; width: 100%; padding: 0; margin: 5px; outline: none;" readonly title="content">${saveValue}</textarea>
                 </div>
                 <div style="display: flex; justify-content: space-around;">
-                    <button id="stb-edit" type="button" title="edit" style="margin: 5px; width: 50%; cursor: pointer;">${getLang()[0]}</button>
-                    <button id="stb-cancel" type="button" title="cancel" style="margin: 5px; width: 50%; cursor: pointer; display: none;">${getLang()[1]}</button>
+                    <button id="stb-edit" type="button" title="edit" style="margin: 5px; width: 50%; cursor: pointer;">${language[0]}</button>
+                    <button id="stb-cancel" type="button" title="cancel" style="margin: 5px; width: 50%; cursor: pointer; display: none;">${language[1]}</button>
                 </div>
             </form>
         `;
+        this.style = `display: grid; justify-self: center; height: ${this.getAttribute("height") || "180px"}; width: ${this.getAttribute("width") || "180px"};`;
         this.querySelector("#stb-edit").addEventListener("click", (e) => {
             const edit = this.querySelector("#stb-edit"), 
             textarea = this.querySelector("textarea"),
             cancel = this.querySelector("#stb-cancel");
             textarea.readOnly = !textarea.readOnly;
             if (textarea.readOnly) {
-                edit.textContent = getLang()[0];
+                edit.textContent = language[0];
                 edit.type = "submit";
                 cancel.style.display = "none";
             } else {
-                edit.textContent = getLang()[2];
+                edit.textContent = language[2];
                 edit.type = "button";
                 cancel.style.display = "block";
             }
@@ -54,35 +56,40 @@ class SaveTextBox extends HTMLElement {
             textarea = this.querySelector("textarea"),
             cancel = this.querySelector("#stb-cancel");
             textarea.readOnly = !textarea.readOnly;
-            edit.textContent = getLang()[0];
-            textarea.value = this.saveValue;
+            edit.textContent = language[0];
+            textarea.value = saveValue;
             cancel.style.display = "none";
             return null;
         });
         this.querySelector("form").addEventListener("submit", (e) => {
             e.preventDefault();
-            const textarea = this.querySelector("textarea")
-            this.saveValue = textarea.value.trim();
-            textarea.value = this.saveValue;
-            return this.saveValue;
+            const textarea = this.querySelector("textarea");
+            saveValue = textarea.value.trim();
+            textarea.value = saveValue;
+            return saveValue;
         });
+        this.getSaveValue = () => {
+            return saveValue;
+        };
         this.setSaveValue = (value) => {
             value = String(value).trim();
-            this.saveValue = value;
+            saveValue = value;
             this.querySelector("textarea").value = value;
             return value;
-        }
-    }
+        };
+    };
 
     connectedCallback() {
         console.log("> Save TextBox ready !");
-    }
+    };
 
     disconnectedCallback() {
         console.log("< Save TextBox unset !");
-    }
-}
+    };
+};
 
 customElements.define("save-text-box", SaveTextBox);
 
-// https://encryption.nexcord.pro/lou-du-poitou //
+// For LICENSE and README see ./SaveTextBox.md //
+
+// http://loudupoitou.dns-dynamic.net //
